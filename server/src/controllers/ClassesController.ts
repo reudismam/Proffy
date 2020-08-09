@@ -2,6 +2,12 @@ import db from '../database/connection';
 import convertHourToMinutes from '../utils/convertHourToMinutes';
 import { Request, Response } from 'express';
 
+interface ScheduleItem {
+    week_day: number;
+    from: string;
+    to: string;
+}
+
 export default class ClasseController {
     async index(request: Request, response: Response) {
         const filters = request.query;
@@ -44,9 +50,8 @@ export default class ClasseController {
             bio,
             subject,
             cost,
-            scredule
+            schedule
         } = request.body;
-
         const trx = await db.transaction();
 
         try {
@@ -67,12 +72,12 @@ export default class ClasseController {
 
             const class_id = insertedCLasesId[0];
 
-            const classScredule = scredule.map((screduleItem: ScreduleItem) => {
+            const classScredule = schedule.map((scheduleItem: ScheduleItem) => {
                 return {
                     class_id,
-                    week_day: screduleItem.week_day,
-                    from: convertHourToMinutes(screduleItem.from),
-                    to: convertHourToMinutes(screduleItem.to)
+                    week_day: scheduleItem.week_day,
+                    from: convertHourToMinutes(scheduleItem.from),
+                    to: convertHourToMinutes(scheduleItem.to)
                 }
             });
 
